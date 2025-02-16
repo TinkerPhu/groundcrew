@@ -22,6 +22,9 @@ opj = os.path.join
 CLASS_NODE_TYPE = ast.ClassDef
 FUNCTION_NODE_TYPE = ast.FunctionDef
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def populate_db(descriptions: dict[str, str], collection: Collection) -> None:
     """
@@ -90,8 +93,12 @@ def summarize_file(
     # TODO - skip file if there are too many tokens
 
     # Get the file text
-    with open(opj(repo_dir_path, filepath), 'r') as f:
-        file_text = ''.join(f.readlines())
+    try:
+        with open(opj(repo_dir_path, filepath), 'r') as f:
+            file_text = ''.join(f.readlines())
+    except Exception as ex:
+        print(f"### issue with reading {filepath}: {ex}\nskipping file")
+        return
 
     # If it's a Python file also extract classes and functions
     if filepath.endswith('.py'):

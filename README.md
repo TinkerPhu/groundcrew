@@ -83,8 +83,13 @@ cp ~/Downloads/tools.yaml .cache/
 ## Run Groundcrew
 
 To run `groundcrew` you will need your OpenAI API key saved as an environmental variable.  It is not already set, run `export OPENAI_API_KEY=<your private API key>` to set it.
+You may place a file called '.env' in the projects root dir instead and add this line:
+`OPENAI_API_KEY=sk-proj-FwPO...< your key here >...z9g-KLAAA`
 
-To start the application run `TOKENIZERS_PARALLELISM=false python -m scripts.run` from the `groundcrew` directory.  After everything loads you will be presented with a user prompt.  Type your questions here and wait for the system to respond.
+
+PHU: This seams wrong:*To start the application run `TOKENIZERS_PARALLELISM=false python -m scripts.run` from the `groundcrew` directory.  After everything loads you will be presented with a user prompt.  Type your questions here and wait for the system to respond.*
+
+To start the application run `python -m scripts.run` from the `groundcrew` directory.  After everything loads you will be presented with a user prompt.  Type your questions here and wait for the system to respond.
 
 Example questions:
 
