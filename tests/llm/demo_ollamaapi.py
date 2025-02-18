@@ -2,6 +2,7 @@
 Demo for ollama API.
 """
 
+
 from unittest.mock import patch
 
 import pytest
@@ -25,6 +26,9 @@ response: ChatResponse = client.chat(model='gemma2:2b', messages=[
     'content': 'Why is the sky blue?',
   },
 ])
+
 print(response['message']['content'])
 # or access fields directly from the response object
 print(response.message.content)
+
+

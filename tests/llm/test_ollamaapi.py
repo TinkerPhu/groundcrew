@@ -14,28 +14,9 @@ from groundcrew.llm import ollamaapi
 @pytest.fixture
 def ollama_chat_response():
     def _chat_output(content, role):
-        return ollama.types.chat.ChatCompletion(
-            choices=[
-                ollama.types.chat.chat_completion.Choice(
-                    finish_reason="stop",
-                    index=0,
-                    logprobs=None,
-                    message=ollama.types.chat.ChatCompletionMessage(
-                        content=content,
-                        role=role
-                    )
-                )
-            ],
-            created=1689623190,
-            id="chatcmpl-xyz",
-            model="gpt-3.5-turbo-0613-mock",
-            system_fingerprint="fp_44709d6fcb",
-            object="chat.completion",
-            usage=ollama.types.CompletionUsage(
-                completion_tokens=99,
-                prompt_tokens=99,
-                total_tokens=99
-            )
+        return ollama._types.ChatResponse(
+            created_at = '2025-02-18T17:23:52.475687808Z'
+            message=ollama.Message(role=role, content=content)
         )
 
     return _chat_output
@@ -44,19 +25,19 @@ def ollama_chat_response():
 @pytest.fixture
 def ollama_tool_response():
     def _chat_output(content, role, function_name, function_args):
-        return ollama.types.chat.ChatCompletion(
+        return ollama._types.chat.ChatCompletion(
             choices=[
-                ollama.types.chat.chat_completion.Choice(
+                ollama._types.chat.chat_completion.Choice(
                     finish_reason='stop',
                     index=0,
                     logprobs=None,
-                    message=ollama.types.chat.ChatCompletionMessage(
+                    message=ollama._types.chat.ChatCompletionMessage(
                         content=content,
                         role=role,
                         tool_calls=[
-                            ollama.types.chat.chat_completion_message_tool_call.ChatCompletionMessageToolCall(
+                            ollama._types.chat.chat_completion_message_tool_call.ChatCompletionMessageToolCall(
                                 id='some_string',
-                                function=ollama.types.chat.chat_completion_message_tool_call.Function(
+                                function=ollama._types.chat.chat_completion_message_tool_call.Function(
                                     arguments=function_args,
                                     name=function_name
                                 ),
@@ -71,7 +52,7 @@ def ollama_tool_response():
             model="gpt-3.5-turbo-0613-mock",
             system_fingerprint="fp_44709d6fcb",
             object="chat.completion",
-            usage=ollama.types.CompletionUsage(
+            usage=ollama._types.CompletionUsage(
                 completion_tokens=99,
                 prompt_tokens=99,
                 total_tokens=99
@@ -83,9 +64,9 @@ def ollama_tool_response():
 @pytest.fixture
 def ollama_embedding_response():
     def _embedding_response(num_embeddings, embedding_dim):
-        return ollama.types.CreateEmbeddingResponse(
+        return ollama._types.CreateEmbeddingResponse(
             data=[
-                ollama.types.Embedding(
+                ollama._types.Embedding(
                     embedding=[0.42]*embedding_dim,
                     index=i,
                     object='embedding'
@@ -94,7 +75,7 @@ def ollama_embedding_response():
             ],
             model='fake_embedding_model',
             object='list',
-            usage=ollama.types.create_embedding_response.Usage(
+            usage=ollama._types.create_embedding_response.Usage(
                 prompt_tokens=99,
                 total_tokens=99
             )
@@ -198,7 +179,7 @@ def test_dict_to_message():
     assert ollamaapi.dict_to_message(dict)==message
 
 
-@patch('groundcrew.llm.ollamaapi.ollama.resources.chat.completions.Completions.create')
+@patch('groundcrew.llm.ollamaapi.ollama.Client.chat')
 def test_chat_completion(chat_mock, ollama_chat_response, ollama_tool_response):
     target_output_content = 'Who is there?'
     target_output_role = 'assistant'
@@ -206,7 +187,7 @@ def test_chat_completion(chat_mock, ollama_chat_response, ollama_tool_response):
         target_output_content,
         target_output_role
     )
-    client = ollamaapi.get_ollamaai_client('fake_api_key')
+    client = ollamaapi.get_ollamaai_client('fake_host')
     model = ollamaapi.start_chat('test_model', client)
     messages = [
         ollamaapi.SystemMessage('You are a helpful assistant.'),

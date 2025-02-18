@@ -131,7 +131,7 @@ def get_ollamaai_client(host: str | None = None) -> ollama.Client:
 
     client = ollama.Client(
         host='http://10.202.48.60:11434',
-        headers={'x-some-header': 'some-value'}
+        #headers={'x-some-header': 'some-value'}
     )
 
     return client
@@ -235,7 +235,13 @@ def start_chat(model: str, client: ollama.Client) -> Callable:
 
         input_messages = [message_to_dict(message) for message in messages]
         try:
-            response = client.chat.completions.create(
+            # response = client.chat.completions.create(
+            #     messages=input_messages,
+            #     model=model,
+            #     *args,
+            #     **kwargs
+            # )
+            response = client.chat(
                 messages=input_messages,
                 model=model,
                 *args,
