@@ -5,6 +5,7 @@ Demo for ollama API.
 
 from unittest.mock import patch
 
+import os
 import pytest
 import ollama
 import json
@@ -15,8 +16,13 @@ from groundcrew.llm import ollamaapi
 from ollama import ChatResponse
 
 from ollama import Client
+
+from dotenv import load_dotenv
+load_dotenv("..")
+host_url = os.environ.get("OLLAMA_API_URL")
+
 client = Client(
-  host='http://10.202.48.60:11434',
+  host=host_url,
   headers={'x-some-header': 'some-value'}
 )
 

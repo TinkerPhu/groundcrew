@@ -15,7 +15,7 @@ from groundcrew.llm import ollamaapi
 def ollama_chat_response():
     def _chat_output(content, role):
         return ollama._types.ChatResponse(
-            created_at = '2025-02-18T17:23:52.475687808Z'
+            created_at = '2025-02-18T17:23:52.475687808Z',
             message=ollama.Message(role=role, content=content)
         )
 

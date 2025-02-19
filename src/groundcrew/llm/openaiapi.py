@@ -126,7 +126,7 @@ class ToolMessage:
 Message = SystemMessage | UserMessage | AssistantMessage | ToolMessage
 
 
-def get_openaiai_client(api_key: str | None = None) -> openai.Client:
+def get_llm_client(api_key: str | None = None) -> openai.Client:
     """Get an OpenAI API client."""
     return openai.OpenAI(api_key=api_key)
 

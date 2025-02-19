@@ -5,6 +5,7 @@ import os
 import ast
 import inspect
 import importlib
+import re
 
 from typing import Any, Callable
 
@@ -18,8 +19,8 @@ from pygments.lexers import PythonLexer
 from pygments.formatters import Terminal256Formatter
 
 from groundcrew import constants, system_prompts as sp
-from groundcrew.llm import openaiapi
-from groundcrew.llm.openaiapi import Message
+from groundcrew.llm import llmapi
+from groundcrew.llm.llmapi import Message
 from groundcrew.dataclasses import Tool
 
 
@@ -78,31 +79,52 @@ def build_llm_chat_client(
         model: str = constants.DEFAULT_MODEL) -> Callable[[list[Message]], str]:
     """Make an LLM client that accepts a list of messages and returns a response."""
     if 'gpt' in model:
-        client = openaiapi.get_openaiai_client()
-        chat_session = openaiapi.start_chat(model, client)
+        client = llmapi.get_llm_client()
+        chat_session = llmapi.start_chat(model, client)
 
         def chat(messages: list[Message]) -> Message:
             return chat_session(messages)
+    else:
+        client = llmapi.get_llm_client()
+        chat_session = llmapi.start_chat(model, client)
 
+        def chat(messages: list[Message]) -> Message:
+            return chat_session(messages)
+    
     return chat
-
 
 def build_llm_completion_client(
         model: str = constants.DEFAULT_MODEL) -> Callable[[str], str]:
     """Make an LLM client that accepts a string prompt and returns a response."""
     if 'gpt' in model:
-        client = openaiapi.get_openaiai_client()
-        completion = openaiapi.start_chat(model, client)
+        client = llmapi.get_llm_client()
+        completion = llmapi.start_chat(model, client)
 
         def chat_complete(prompt):
             try:
                 messages = [
-                    openaiapi.SystemMessage("You are a helpful assistant."),
-                    openaiapi.UserMessage(prompt)
+                    llmapi.SystemMessage("You are a helpful assistant."),
+                    llmapi.UserMessage(prompt)
                 ]
                 response = completion(messages)
                 return response.content
             except Exception:
+                return ''
+
+    else:
+        client = llmapi.get_llm_client()
+        completion = llmapi.start_chat(model, client)
+
+        def chat_complete(prompt):
+            try:
+                messages = [
+                    llmapi.SystemMessage("You are a helpful assistant."),
+                    llmapi.UserMessage(prompt)
+                ]
+                response = completion(messages)
+                return response.content
+            except Exception as ex:
+                print("=== Exception === :", ex)
                 return ''
 
     return chat_complete
@@ -201,7 +223,19 @@ def setup_tools(
                         tool_yaml = '\n'.join(tool_yaml[1:-1])
 
                 # Convert YAML to a dictionary
-                tool_info_dict = yaml.safe_load(tool_yaml)
+                
+                try:
+                    tool_info_dict = yaml.safe_load(tool_yaml)
+                except Exception as ex:
+                    print("@@@ exception for yaml.safe_load:", ex)
+                    tool_yaml_fixed = try_to_fix_yaml_error(tool_yaml,ex)
+                    tool_yaml_post = post_process_yaml_response(tool_yaml_fixed)
+                    try:
+                        tool_info_dict = yaml.safe_load(tool_yaml_post)
+                    except Exception as exex:       
+                        print(f"@@@ could not fix yaml: {exex}\n  ==> skipping tool {node.name}")
+                        continue
+
                 if isinstance(tool_info_dict, list):
                     tool_info_dict = tool_info_dict[0]
 
@@ -246,7 +280,7 @@ def setup_tools(
 
 def convert_tool_str_to_yaml(function_str: str, llm: Callable) -> str:
     """
-    Convert a given tool string to YAML format using a GPT-4 model.
+    Convert a given tool string to YAML format using a llm model.
 
     Args:
         function_str (str): The string representation of a function.
@@ -287,3 +321,50 @@ def save_tools_to_yaml(tools: dict[str, Tool], filename: str) -> None:
     with open(filename, 'w') as file:
         yaml.dump(data, file, default_flow_style=False, sort_keys=False)
     print(f'Saved {filename}\n')
+
+
+def post_process_yaml_response(text):
+    # Remove spaces before/after newlines and join split characters
+    fixed_text = re.sub(r'(?<!\n)\n(?!\n)', '', text)
+    
+    fixed_text = re.sub(r'\n\n', '', fixed_text)
+    
+    # Handle unnecessary leading/trailing newlines
+    fixed_text = fixed_text.strip()
+
+    m = re.match(r'(``yaml\n((\n|.)*)``)', fixed_text)
+    if m:
+        fixed_text = m.group(2)
+    print("✍")
+    return fixed_text
+
+def correct_mapping_values_are_not_allowed_here_yaml(yaml_content, error_message):
+    # Extract line and column number from error message
+    match = re.search(r"line (\d+), column (\d+):", error_message)
+    if not match:
+        print("Could not extract line and column from error message.")
+        return yaml_content
+
+    line_num, col_num = int(match.group(1)), int(match.group(2))
+
+    # Split YAML into lines
+    lines = yaml_content.split("\n")
+
+    # Ensure the line number is within the valid range
+    if line_num > len(lines):
+        print("Line number out of range.")
+        return yaml_content
+
+    # Replace ':' with '.' at the specified column
+    line = lines[line_num - 1]  # 0-based index
+    if col_num - 1 < len(line) and line[col_num - 1] == ':':
+        lines[line_num - 1] = line[:col_num - 1] + ';' + line[col_num:]
+
+    # Join the corrected lines
+    return "\n".join(lines)
+
+def try_to_fix_yaml_error(yaml_content, error_message):
+    # Apply the correction
+    if "mapping values are not allowed here" in str(error_message):
+        return correct_mapping_values_are_not_allowed_here_yaml(yaml_content, error_message)
+    return yaml_content

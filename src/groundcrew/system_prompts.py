@@ -60,6 +60,7 @@ Restrictions:
 - Do not engage in any conversation.
 - Do not include ```yaml in your answer
 - The description should talk about the class as a `Tool` and not mention it being a Python class
+- The description should also not include colons as they are against the syntax of yaml.
 - Do not include anything that isn't valid YAML in your answer
 - Do not include backticks in your answer
 - Do not include ```yaml in your answer

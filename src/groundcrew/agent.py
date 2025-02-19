@@ -12,7 +12,7 @@ from chromadb import Collection
 
 from groundcrew import agent_utils as autils, system_prompts as sp, utils
 from groundcrew.dataclasses import Colors, Config, Tool
-from groundcrew.llm.openaiapi import SystemMessage, UserMessage, AssistantMessage, Message
+from groundcrew.llm.llmapi import SystemMessage, UserMessage, AssistantMessage, Message
 
 
 class Agent:

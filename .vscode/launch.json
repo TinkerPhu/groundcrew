@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Python Debugger: Module Script.Run",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "scripts.run",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "python": "${workspaceFolder}/.venv/scripts/python",
+            "args": ["--model", "gemma2:2b"]//, "--arg2", "value2"]
+        }
+    ]
+}

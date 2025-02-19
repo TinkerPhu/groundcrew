@@ -81,7 +81,7 @@ if response.tool_calls is not None:
 response = chat(messages, tools=tools)
 print(response)
 """
-
+import os
 from typing import Callable, Iterable
 from dataclasses import dataclass
 import json
@@ -126,11 +126,12 @@ class ToolMessage:
 Message = SystemMessage | UserMessage | AssistantMessage | ToolMessage
 
 
-def get_ollamaai_client(host: str | None = None) -> ollama.Client:
+def get_llm_client(host: str | None = None) -> ollama.Client:
     """Get an ollama API client."""
 
+    host_url = os.environ.get("OLLAMA_API_URL")
     client = ollama.Client(
-        host='http://10.202.48.60:11434',
+        host=host_url,
         #headers={'x-some-header': 'some-value'}
     )
 
@@ -199,7 +200,7 @@ def dict_to_message(message_dict: dict) -> Message:
 
 def message_from_api_response(response: dict) -> AssistantMessage:
     """Parse the API response."""
-    completion = response.choices[0].message
+    completion = response.message
 
     if completion.tool_calls is not None:
         tool_calls = [
@@ -247,8 +248,11 @@ def start_chat(model: str, client: ollama.Client) -> Callable:
                 *args,
                 **kwargs
             )
+            print("🗨")
             return message_from_api_response(response)
-        except ollama.APIError:
+        except Exception as ex:
+            print("@@@ client.chat exception:", ex)
+        #except ollama.APIError:
             return UserMessage('There was an API error.  Please try again.')
 
     return chat_func

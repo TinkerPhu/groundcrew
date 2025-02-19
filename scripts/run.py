@@ -23,7 +23,6 @@ CLASS_NODE_TYPE = ast.ClassDef
 FUNCTION_NODE_TYPE = ast.FunctionDef
 
 from dotenv import load_dotenv
-
 load_dotenv()
 
 def populate_db(descriptions: dict[str, str], collection: Collection) -> None:
@@ -97,7 +96,7 @@ def summarize_file(
         with open(opj(repo_dir_path, filepath), 'r') as f:
             file_text = ''.join(f.readlines())
     except Exception as ex:
-        print(f"### issue with reading {filepath}: {ex}\nskipping file")
+        print(f"@@@ issue with reading {filepath}: {ex}\n  ==> skipping file {filepath}")
         return
 
     # If it's a Python file also extract classes and functions

@@ -147,7 +147,7 @@ class LintFileTool:
             '\n### Task ###\n' + self.base_prompt +
             '\n### Question ###\n' + user_prompt + '\n'
         )
-
+        print("Linter🔍")
         return self.llm(prompt)
 
     def run_ruff(self, filepath: str) -> str:
