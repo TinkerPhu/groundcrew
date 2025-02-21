@@ -1,10 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Collections;
+using System.Text.Json;
+using static CodeExtractor.CSharpCodeExtractor;
 
 namespace CodeExtractor.App
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             // Ensure correct arguments
             if (args.Length != 2)
@@ -14,7 +16,7 @@ namespace CodeExtractor.App
             }
 
             string filePath = args[0];
-            string nodeType = args[1];
+            string nodeTypes = args[1];
 
             // Validate if file exists
             if (!File.Exists(filePath))
@@ -25,14 +27,25 @@ namespace CodeExtractor.App
 
             try
             {
-                Dictionary<string, object> typeResults = new Dictionary<string, object>();
-                var nodeTypes = nodeType.Split(',');
-                foreach (var type in nodeTypes)
-                {
-                    // Call the method
-                    Dictionary<string, object> result = CodeExtractor.ExtractFromFile(filePath, type);
+                // Call the method
+                Dictionary<string, object> typeResults = CSharpCodeExtractor.ExtractFromFile(filePath, nodeTypes);
 
-                    typeResults[type] = result;
+                if(typeResults.ContainsKey(NodeType.Class.ToString()))
+                {
+                    var classNames = ((Dictionary<string, object>)typeResults[NodeType.Class.ToString()]).Keys;
+
+                    //var res = await DebugCompilation.ListAllTypes("../../../../CodeExtractor.sln");
+
+                    var usages = await CSharpUsageAnalyzer.GetUsage("../../../../CodeExtractor.sln", classNames);
+
+                    foreach (var classInfo in (Dictionary<string, object>)typeResults[NodeType.Class.ToString()])
+                    {
+                        if (usages.ContainsKey(classInfo.Key))
+                        {
+                            var classInfoContent = (Dictionary<string, object>)classInfo.Value;
+                            classInfoContent["usages"] = usages[classInfo.Key];
+                        }
+                    }
                 }
 
                 string jsonOutput = JsonSerializer.Serialize(typeResults, new JsonSerializerOptions { WriteIndented = true });

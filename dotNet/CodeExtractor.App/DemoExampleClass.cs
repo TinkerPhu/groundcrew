@@ -11,4 +11,9 @@
             return "055";
         }
     }
+
+    public class UserOfDemoExampleClass
+    {
+        public DemoExampleClass myMember;
+    }
 }

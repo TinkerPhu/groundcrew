@@ -2,7 +2,7 @@
   "profiles": {
     "CodeExtractor.App": {
       "commandName": "Project",
-      "commandLineArgs": "../../../Class2.cs Class,Method"
+      "commandLineArgs": "../../../DemoExampleClass.cs Class,Method"
     }
   }
 }

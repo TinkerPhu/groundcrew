@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -6,8 +7,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CodeExtractor.Tests;
 
 [TestClass]
-[TestSubject(typeof(global::CodeExtractor.CodeExtractor))]
-public class CodeExtractorTest
+[TestSubject(typeof(global::CodeExtractor.CSharpCodeExtractor))]
+public class CSharpCodeExtractorTest
 {
 
     [TestMethod]
@@ -18,11 +19,13 @@ public class CodeExtractorTest
         
         Assert.IsTrue(File.Exists(path));
 
-        var resultClasses  = global::CodeExtractor.CodeExtractor.ExtractFromFile(path, "Class");
+        var result  = global::CodeExtractor.CSharpCodeExtractor.ExtractFromFile(path, "Class");
+        var resultClasses = (Dictionary<string,object>)result["Class"];
         Assert.AreEqual(1, resultClasses.Keys.Count);
         Assert.Contains("ExampleClass", resultClasses.Keys);
 
-        var resultMethods  = global::CodeExtractor.CodeExtractor.ExtractFromFile(path, "Method");
+        result  = global::CodeExtractor.CSharpCodeExtractor.ExtractFromFile(path, "Method");
+        var resultMethods = (Dictionary<string,object>)result["Method"];
         Assert.AreEqual(2, resultMethods.Keys.Count);
         Assert.Contains("ExampleClass.MethodOne", resultMethods.Keys);
         Assert.Contains("ExampleClass.MethodTwo", resultMethods.Keys);
