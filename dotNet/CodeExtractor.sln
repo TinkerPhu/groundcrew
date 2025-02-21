@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeExtractor", "CodeExtrac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeExtractor.Tests", "CodeExtractor.Tests\CodeExtractor.Tests.csproj", "{35AC6C64-963B-4C99-A650-5B33EE11FBAC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeExtractor.App", "CodeExtractor.App\CodeExtractor.App.csproj", "{CDBB015E-3D99-4F66-9472-DB27C85A02D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{35AC6C64-963B-4C99-A650-5B33EE11FBAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35AC6C64-963B-4C99-A650-5B33EE11FBAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35AC6C64-963B-4C99-A650-5B33EE11FBAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDBB015E-3D99-4F66-9472-DB27C85A02D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDBB015E-3D99-4F66-9472-DB27C85A02D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDBB015E-3D99-4F66-9472-DB27C85A02D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDBB015E-3D99-4F66-9472-DB27C85A02D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,7 @@
 ﻿using System;
 
+namespace CodeExtractor.Tests;
+
 public class ExampleClass
 {
     public void MethodOne()

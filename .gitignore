@@ -1,10 +1,10 @@
 # Our own stuff
 *.pkl
-/.database*/**
-/.cache*/**
+/.database*/*
+/.cache*/*
 
 # Byte-compiled / optimized / DLL files
-__pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -164,8 +164,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .vs/
-dotNet/CodeExtractor.Tests/bin/
-dotNet/CodeExtractor.Tests/obj/
-dotNet/CodeExtractor/bin/
-dotNet/CodeExtractor/obj/
+**/bin/*
+**/obj/*
 *.user
+dotNet/binaries/**
