@@ -14,7 +14,8 @@ import chromadb
 from chromadb import Collection
 
 from groundcrew import system_prompts as sp, utils
-from groundcrew.code import extract_python_from_file, init_db
+from groundcrew.code import init_db
+from groundcrew.code_analyser_python import extract_python_from_file
 from groundcrew.agent import Agent
 from groundcrew.dataclasses import Config
 

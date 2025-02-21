@@ -29,7 +29,7 @@ def attempt_to_fix_error(yaml_content, error_message):
     # Apply the correction
     if "mapping values are not allowed here" in error_msg:
         return correct_mapping_values_are_not_allowed_here_yaml(yaml_data, error_msg)
-    
+
 
     
 # Example error message and YAML
