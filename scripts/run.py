@@ -93,11 +93,18 @@ def summarize_file(
     # TODO - skip file if there are too many tokens
 
     # Get the file text
+    opj_path = opj(repo_dir_path, filepath)
     try:
-        with open(opj(repo_dir_path, filepath), 'r') as f:
+        with open(opj_path, 'r') as f:
             file_text = ''.join(f.readlines())
+    except UnicodeDecodeError as ex:
+        with open(opj_path, encoding="utf8", errors='ignore') as f:
+            file_text = ''.join(f.readlines())
+    except FileNotFoundError as ex:
+        print(f"@@@ file not found ({filepath}): {ex}\n  Reason: most likely filepath is still in cache. Clear cache (delete .cache directory) to get rid of this warning.\n  => ignoring and skip")
+        return
     except Exception as ex:
-        print(f"@@@ issue with reading {filepath}: {ex}\n  ==> skipping file {filepath}")
+        print(f"@@@ issue with reading {filepath}: {ex}\n  => skipping file {filepath}")
         return
 
     # If it's a Python file also extract classes and functions
@@ -105,7 +112,7 @@ def summarize_file(
 
         # Summarize entire Python file
         if filepath not in descriptions:
-            print('Generating summary for', filepath, '...')
+            print('Generating summary for file', filepath, '...')
             prompt = filepath + '\n\n' + file_text + '\n\n'
             prompt += sp.SUMMARIZE_CODE_PROMPT
             file_summary = llm(prompt)
@@ -141,7 +148,7 @@ def summarize_file(
             key = filepath + '::' + name
 
             if key not in descriptions:
-                print('Generating summary for', key, '...')
+                print('Generating summary for class or function', key, '...')
                 prompt = filepath + '\n\n' + info['text'] + '\n\n'
                 prompt += sp.SUMMARIZE_CODE_PROMPT
                 info['summary'] = llm(prompt)
@@ -155,7 +162,7 @@ def summarize_file(
     else:
         key = filepath
         if key not in descriptions:
-            print('Generating summary for', key, '...')
+            print('Generating summary for generic file', key, '...')
             prompt = filepath + '\n\n' + file_text + '\n\n'
             prompt += sp.SUMMARIZE_FILE_PROMPT
             file_summary = llm(prompt)

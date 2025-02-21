@@ -110,7 +110,7 @@ class Agent:
                 user_prompt = input('[user] > ')
                 if '\\code' in user_prompt:
                     print(Colors.YELLOW)
-                    print('Code mode activated — type \end to submit')
+                    print('Code mode activated — type \\end to submit')
                     print(Colors.ENDC)
                     user_prompt += '\n'
 

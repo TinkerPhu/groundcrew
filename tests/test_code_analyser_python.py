@@ -1,4 +1,4 @@
-import groundcrew.code_utils as cu
+import groundcrew.code_analyser_python as cu
 
 TEST_CODE = """
 import numpy as np

@@ -248,7 +248,7 @@ def start_chat(model: str, client: ollama.Client) -> Callable:
                 *args,
                 **kwargs
             )
-            print("🗨")
+            print(f"🗨LLM({model})")
             return message_from_api_response(response)
         except Exception as ex:
             print("@@@ client.chat exception:", ex)

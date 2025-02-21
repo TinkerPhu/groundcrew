@@ -10,7 +10,7 @@ from typing import Callable
 from thefuzz import process as fuzzprocess
 from chromadb import Collection
 
-from groundcrew import code, system_prompts as sp, code_utils as cu
+from groundcrew import code, system_prompts as sp, code_analyser_python as cu
 from groundcrew.dataclasses import Chunk
 
 
