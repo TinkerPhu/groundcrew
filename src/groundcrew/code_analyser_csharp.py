@@ -41,7 +41,7 @@ def existing_abs_path(any_path:str)->str:
 
 if __name__ == "__main__":
     # Example usage
-    file_path = "./dotNet/CodeExtractor/CodeExtractor.cs"
+    file_path = "./dotNet/CodeExtractor/CSharpCodeExtractor.cs"
     node_type = "Class,Method"
 
     output = extract_csharp_from_file(file_path, node_type)

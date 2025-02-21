@@ -8,7 +8,7 @@ namespace CodeExtractor.Tests;
 
 [TestClass]
 [TestSubject(typeof(global::CodeExtractor.CSharpCodeExtractor))]
-public class CSharpCodeExtractorTest
+public class CSharpCodeExtractorShould
 {
 
     [TestMethod]

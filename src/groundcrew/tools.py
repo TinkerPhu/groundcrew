@@ -10,7 +10,7 @@ from typing import Callable
 from thefuzz import process as fuzzprocess
 from chromadb import Collection
 
-from groundcrew import code, system_prompts as sp, code_analyser_python as cu
+from groundcrew import code, system_prompts as sp, code_analyser_python as py_cu
 from groundcrew.dataclasses import Chunk
 
 
@@ -444,7 +444,7 @@ class CyclomaticComplexityTool:
     def __get_complexity(source_code: str) -> dict[str, dict]:
         """Get the complexity of source code."""
 
-        complexity_dict = cu.cyclomatic_complexity(source_code)
+        complexity_dict = py_cu.cyclomatic_complexity(source_code)
         if len(complexity_dict) == 0:
             average_complexity, max_complexity = 0, 0
         else:
@@ -558,9 +558,9 @@ class FindUsageTool:
 
         usages = {}
         for file, source_code in files.items():
-            file_imports = cu.get_imports_from_code(source_code)
-            if cu.imports_entity(file_imports, importable_object):
-                called_as = cu.import_called_as(file_imports, importable_object)
+            file_imports = py_cu.get_imports_from_code(source_code)
+            if py_cu.imports_entity(file_imports, importable_object):
+                called_as = py_cu.import_called_as(file_imports, importable_object)
                 source_without_imports = '\n'.join(
                     line for line in source_code.split('\n')
                     if not re.search(import_pattern, line)

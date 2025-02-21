@@ -127,6 +127,7 @@ def cyclomatic_complexity(code: str) -> dict:
 
     return output
 
+
 def extract_python_from_file(file_text, node_types):
     file_lines = file_text.split('\n')
     texts = {}
