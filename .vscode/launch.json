@@ -4,9 +4,20 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
-            "name": "Python Debugger: Module Script.Run",
+            "name": "Python Debugger: Module Script.Run openai",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "scripts.run",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "python": "${workspaceFolder}/.venv/scripts/python",
+            "args": ["--model", "gpt-4-1106-preview", "--config", "groundcrew_openai_config.yaml"]//, "--arg2", "value2"]        
+        },
+        {
+            "name": "Python Debugger: Module Script.Run gemma",
             "type": "debugpy",
             "request": "launch",
             "module": "scripts.run",
@@ -16,6 +27,18 @@
             },
             "python": "${workspaceFolder}/.venv/scripts/python",
             "args": ["--model", "gemma2:2b"]//, "--arg2", "value2"]
+        },
+        {
+            "name": "Python Debugger: Module Script.Run deepseek",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "scripts.run",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "python": "${workspaceFolder}/.venv/scripts/python",
+            "args": ["--model", "deepseek-r1:32b", "--config", "groundcrew_deepseek_config.yaml"]//, "--arg2", "value2"]
         }
     ]
 }

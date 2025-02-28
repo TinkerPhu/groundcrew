@@ -10,8 +10,8 @@ import importlib
 #    from .openaiapi import *  # Import everything from openaiapi
 
 
-#llm_module = importlib.import_module(f"groundcrew.llm.openaiapi")
-llm_module = importlib.import_module(f"groundcrew.llm.ollamaapi")
+llm_module = importlib.import_module(f"groundcrew.llm.openaiapi")
+#llm_module = importlib.import_module(f"groundcrew.llm.ollamaapi")
 
 
 

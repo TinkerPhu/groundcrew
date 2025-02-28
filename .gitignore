@@ -168,3 +168,4 @@ cython_debug/
 **/obj/*
 *.user
 dotNet/binaries/**
+**/published*/**

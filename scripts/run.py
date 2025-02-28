@@ -199,6 +199,9 @@ def main(config: str, model: str, prompts_file: str | None):
     # Create the chromadb client
     client = chromadb.PersistentClient(config.db_path)
 
+    if config.model:
+        model = config.model
+
     # Initialize the database and get a list of files in the repo
     collection, files = init_db(client, os.path.expanduser(config.repository), config.extensions)
     files = sorted(files)

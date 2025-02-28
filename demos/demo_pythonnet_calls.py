@@ -1,19 +1,31 @@
 #HINT to myself, try again with suggestions from https://github.com/pythonnet/pythonnet/issues/2464
 
 import ctypes
-import clr
 import os
 import sys
 
 # dotnet framework runtime
+import pythonnet
 from pythonnet import load
-load("netfx")
-#load("coreclr")
+info = pythonnet.get_runtime_info()
+#load("netfx")
+conf_path = os.path.abspath(os.path.normpath("./runtimeconfig.json"))
+if not os.path.exists(conf_path): raise Exception(f"File does not exist: {conf_path}")
 
+# from pythonnet import set_runtime
+# from clr_loader import get_coreclr
+
+# rt = get_coreclr(runtime_config="/path/to/runtimeconfig.json")
+# set_runtime(rt)
+
+load("coreclr", runtime_config="./runtimeconfig.json")
+info = pythonnet.get_runtime_info()
+import clr
+info = pythonnet.get_runtime_info()
 
 from System.Collections.Generic import Dictionary
 from System.Collections.Generic import List
-from System.IO.Ports import Parity, StopBits, Handshake
+#from System.IO.Ports import Parity, StopBits, Handshake
 from System import String, Int32, UInt32, UInt16, Object, Single, Double, Boolean
 from System.Net import IPAddress
 from System.Threading import CancellationToken
@@ -21,8 +33,7 @@ from System.IO import File
 
 def get_existing_abs_path(any_path:str)->str:
     abs_path = os.path.abspath(os.path.normpath(any_path))
-    if not os.path.exists(abs_path):
-        raise Exception(f"File does not exist: {abs_path}")
+    if not os.path.exists(abs_path): raise Exception(f"File does not exist: {abs_path}")
     return abs_path
 
 def load_assembly(assembly_path:str)->None:
@@ -37,23 +48,23 @@ def load_assembly(assembly_path:str)->None:
     assembly_name = os.path.splitext(os.path.basename(abs_assembly_path))[0]
     clr.AddReference(assembly_name)
 
+def assert_equal(expectation, value, message):
+    if expectation != value:
+        raise Exception(message)
 
-load_assembly("./dotNet/ClassLibrary1/bin/Debug/net7.0/ClassLibrary1.dll")
-#load_assembly("./dotNet/ClassLibrary1/bin/publish/ClassLibrary1.dll")
+load_assembly("./dotNet/CodeExtractor/bin/Debug/net9.0/CodeExtractor.dll")
+load_assembly("./dotNet/ClassLibrary1/bin/Debug/net9.0/ClassLibrary1.dll")
 
 
-#print(sys.modules.keys())
+from ClassLibrary1 import Class1
 
-from ClassLibrary1NS import Class1
-res = Class1.hello()
+print(sys.modules.keys())
 
-from ClassLibrary1NS import DemoClass
-res = DemoClass.hello()
-res = DemoClass.hello22()
-res = DemoClass.helloT()
-res = DemoClass.helloS()
-if res != '345':
-    raise Exception("wrong return value from helloS")
+assert_equal(12, Class1.hello(), "wrong return value from hello")
+assert_equal('345', Class1.helloS(345), "wrong return value from helloS")
+
+
+
 
 from ClassLibrary1NS import CodeVisitorNew
 codevisitor = CodeVisitorNew("Class")

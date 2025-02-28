@@ -19,6 +19,8 @@ class Config:
     Tools: [str]
     colorscheme: str
     debug: bool
+    model: str
+    llm_module: str
 
 
 @dataclass
