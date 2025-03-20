@@ -167,5 +167,9 @@ cython_debug/
 **/bin/*
 **/obj/*
 *.user
-dotNet/binaries/**
-**/published*/**
+dotNet/binaries/*
+**/published*/*
+**cache/*
+**database/*
+**/.obsidian/*
+**/.trash/*

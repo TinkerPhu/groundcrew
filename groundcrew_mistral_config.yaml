@@ -1,0 +1,18 @@
+repository: ../groundcrew
+extensions: ['.py', '.txt', '.yaml', '.yml', '.sh', '.md', '.toml']
+db_path: .groundcrew_deepseek_database/
+cache_dir: .groundcrew_deepseek_cache/
+Tools:
+  - module: groundcrew.tools
+    tools:
+      - CodebaseQATool
+      - SingleDocstringTool
+      - LintFileTool
+      - GetFileContentsTool
+      - CyclomaticComplexityTool
+      - FindUsageTool
+      - InstallationAndUseTool
+colorscheme: 'gruvbox-dark'
+debug: true
+model: 'mistral:latest'
+llm_module: 'groundcrew.llm.ollamaapi'

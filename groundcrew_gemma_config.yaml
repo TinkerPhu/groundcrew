@@ -1,0 +1,18 @@
+repository: ../groundcrew
+extensions: ['.py', '.txt', '.yaml', '.yml', '.sh', '.md', '.toml']
+db_path: .groundcrew_gemma_database/
+cache_dir: .groundcrew_gemma_cache/
+Tools:
+  - module: groundcrew.tools
+    tools:
+      - CodebaseQATool
+      - SingleDocstringTool
+      - LintFileTool
+      - GetFileContentsTool
+      - CyclomaticComplexityTool
+      - FindUsageTool
+      - InstallationAndUseTool
+colorscheme: 'gruvbox-dark'
+debug: true
+model: 'gemma2:2b'
+llm_module: 'groundcrew.llm.ollamaapi'

@@ -82,12 +82,17 @@ response = chat(messages, tools=tools)
 print(response)
 """
 import os
+from groundcrew.dataclasses import Colors
 from typing import Callable, Iterable
 from dataclasses import dataclass
 import json
+from groundcrew.tools import CodebaseQATool
 
 import ollama
+from ollama._utils import convert_function_to_tool
 
+tool = convert_function_to_tool(CodebaseQATool.__call__)
+#print(json.dumps(tool))
 
 @dataclass(frozen=True)
 class ToolCall:
@@ -245,9 +250,36 @@ def start_chat(model: str, client: ollama.Client) -> Callable:
             response = client.chat(
                 messages=input_messages,
                 model=model,
-                *args,
-                **kwargs
+                tools=[tool]
+                # tools=[
+                #     {
+                #         'type': 'function',
+                #         'function': {
+                #             'name': 'CodebaseQATool',
+                #             'description': 'This Tool processes a user_prompt, queries a codebase, and then uses a language model to provide a response that may include code snippets if requested.',
+                #             'parameters': {
+                #                 'type': 'object',
+                #                 'properties': {
+                #                     'include_code': {
+                #                         'type': 'bool',
+                #                         'description': 'Flag indicating whether to include code snippets in the response',
+                #                     },
+                #                 },
+                #                 'required': ['include_code'],
+                #             },
+                #         },
+                #     }
+                # ],
+                # *args,
+                # **kwargs
             )
+            
+            print(Colors.MAGENTA)
+            print(input_messages)
+            print(Colors.CYAN)
+            print(response.message)
+            print(Colors.ENDC)
+
             print(f"🗨  internal LLM({model})")
             return message_from_api_response(response)
         except Exception as ex:
@@ -255,6 +287,10 @@ def start_chat(model: str, client: ollama.Client) -> Callable:
         #except ollama.APIError:
             return UserMessage('There was an API error.  Please try again.')
 
+        # ollama.Client.chat exceptions:
+        # 'deepseek-r1:32b does not support tools': https://github.com/ollama/ollama/issues/8517
+        # 'gemma2:2b does not support tools': 
+        
     return chat_func
 
 

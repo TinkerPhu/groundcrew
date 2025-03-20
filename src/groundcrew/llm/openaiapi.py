@@ -81,7 +81,7 @@ if response.tool_calls is not None:
 response = chat(messages, tools=tools)
 print(response)
 """
-
+from groundcrew.dataclasses import Colors
 from typing import Callable, Iterable
 from dataclasses import dataclass
 import json
@@ -235,7 +235,14 @@ def start_chat(model: str, client: openai.Client) -> Callable:
                 *args,
                 **kwargs
             )
+            print(Colors.MAGENTA)
+            print(input_messages)
+            print(Colors.CYAN)
+            print(response.choices[0].message)
+            print(Colors.ENDC)
+
             print(f"🗨  openapi LLM({model})")
+            
             return message_from_api_response(response)
         except openai.APIError as ex:
             print(ex)

@@ -4,6 +4,8 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
+
         {
             "name": "Python Debugger: Module Script.Run openai",
             "type": "debugpy",
@@ -26,7 +28,7 @@
                 "PYTHONPATH": "${workspaceFolder}"
             },
             "python": "${workspaceFolder}/.venv/scripts/python",
-            "args": ["--model", "gemma2:2b"]//, "--arg2", "value2"]
+            "args": ["--model", "gemma2:2b", "--config", "groundcrew_gemma_config.yaml"]
         },
         {
             "name": "Python Debugger: Module Script.Run deepseek",
@@ -38,7 +40,19 @@
                 "PYTHONPATH": "${workspaceFolder}"
             },
             "python": "${workspaceFolder}/.venv/scripts/python",
-            "args": ["--model", "deepseek-r1:32b", "--config", "groundcrew_deepseek_config.yaml"]//, "--arg2", "value2"]
+            "args": ["--model", "deepseek-r1:32b", "--config", "groundcrew_deepseek_config.yaml"]
+        },
+        {
+            "name": "Python Debugger: Module Script.Run mistral",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "scripts.run",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "python": "${workspaceFolder}/.venv/scripts/python",
+            "args": ["--model", "mistral:latest", "--config", "groundcrew_mistral_config.yaml"]
         }
     ]
 }
