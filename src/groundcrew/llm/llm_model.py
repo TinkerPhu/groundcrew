@@ -1,5 +1,4 @@
 from typing import Callable
-
 class llm_model():
 
     def __init__(self):
@@ -35,21 +34,20 @@ def extract_json_array(text):
             json_part = json_part[:-3]+"]"
         
         try:
-            #python_obj = ast.literal_eval(json_part)
-            #parsed_json = json.loads(json.dumps(python_obj))  # Parse JSON
 
-            fixed_json = re.sub(r'([{,])\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', json_part)
-            parsed_json = json.loads(fixed_json)
+            parsed_json = json.loads(json_part)
             return parsed_json
         except json.JSONDecodeError:
             try:
-                fixed_json = re.sub(r"\'([^\']*)\'", r'"\1"', json_part)
+                fixed_json = re.sub(r'([{,])\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', json_part)
+                fixed_json = re.sub(r"\'([^\']*)\'", r'"\1"', fixed_json)
                 fixed_json = fixed_json.replace("'",'"')
                 fixed_json = re.sub(r'\bTrue\b', 'true', fixed_json)
                 fixed_json = re.sub(r'\bFalse\b', 'false', fixed_json)
                 fixed_json = re.sub(r'\bNone\b', 'null', fixed_json)
                 parsed_json = json.loads(fixed_json)
                 return parsed_json
+            
             except json.JSONDecodeError:
                 print(f"Invalid JSON: '{json_part}'")
                 return None  # Invalid JSON
@@ -60,10 +58,12 @@ import ollama
 import os
 import requests
 import json
+import inspect
 from types import SimpleNamespace
 from ollama._utils import convert_function_to_tool
 from typing import List, Callable
 from groundcrew.dataclasses import Colors
+
 
 class ollama_model(llm_model):
 
@@ -75,6 +75,7 @@ class ollama_model(llm_model):
         self._tool_str = ""
         self._base_message = base_message
         self._default_model = default_model
+
 
         if self._base_message is None:
             self._base_message = "You are a friendly assistant that answers user questions."
@@ -132,10 +133,16 @@ Parameters (given here as object with properties that are the parameters):
         
         func = self._tool_funcs[tool_name]
         arguments = tool["arguments"]
-        if 'reason' in arguments:
-            arguments.pop('reason', None)
 
-        return func(**arguments)
+        # Use inspect to get the accepted argument names
+        sig = inspect.signature(func)
+        accepted_params = sig.parameters
+
+        # Filter the arguments to include only those accepted by the function
+        filtered_arguments = {
+            k: v for k, v in arguments.items() if k in accepted_params
+        }
+        return func(**filtered_arguments)
         
 
     def single_completion(self, query, model:str|None=None)->tuple:
@@ -155,11 +162,10 @@ Parameters (given here as object with properties that are the parameters):
                             {'role': 'system', 'content':self._base_message},#+"\n"+tools_system_prompt}, 
                             {'role': 'user', 'content':"### Question ###\n"+query}
                         ]
-            
             answer = self._client.chat(model=model,
                                 messages=input_messages,
                                 tools=self._tools
-                )
+                    )
 
         except Exception as ex:
 
@@ -180,15 +186,16 @@ Parameters (given here as object with properties that are the parameters):
 
 
 
-        print(Colors.MAGENTA)
-        for input_message in input_messages:
-            print("\n"+input_message["role"]+":")
-            print(Colors.MAGENTA)
-            print(input_message["content"])
-        print(Colors.CYAN)
-        print("\n"+answer.message["role"]+":")
-        print(answer.message["content"])
-        print(Colors.ENDC)
+        # print(Colors.MAGENTA)
+        # for input_message in input_messages:
+        #     print("\n"+input_message["role"]+":")
+        #     print(Colors.MAGENTA)
+        #     print(input_message["content"])
+        # print(Colors.CYAN)
+        # print("\n"+answer.message["role"]+":")
+        # print(answer.message["content"])
+        # print(Colors.ENDC)
+
         #print(f"\nResponse: {answer.message}\n")
 
         chosen_tools = None
@@ -253,7 +260,7 @@ Each separate Tool call consists of a dictionary with
   Expected response (json string):
     tool_calls: [{"name":"FetchDocument", "arguments": {query: "why is the sky blue?"}, "reason": "the tool is likely to provide documents that explain why the sky is blue"}]
 
-# Do not invent new Tools. Do not ask the user for filepaths or filenames. You must use the tools available to you. The given tools are NOT part of the codebase, only select from them, do not talk about them. Be careful to format in valid JSON format.
+# Do not ask the user for filepaths or filenames. The given tools are NOT part of the codebase, only select from them, do not talk about them. Do not invent new Tools. You must use the tools available to you. Be careful to format in correct and valid JSON format.
 """
 
         tools_system_prompt = CHOOSE_TOOL_PROMPT1 + self._tool_str + CHOOSE_TOOL_PROMPT2

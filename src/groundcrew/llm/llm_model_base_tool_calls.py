@@ -3,6 +3,7 @@ load_dotenv("..")
 
 import json
 
+from groundcrew.dataclasses import Colors
 from groundcrew.toolfolder.time_tools import tool_functions as time_tool_functions
 
 
@@ -53,8 +54,13 @@ for model in models:
             continue
 
         for tool in chosen_tools:
-            tool_answer = llm.call_tool(tool)
-            print(tool_answer)
+            try:
+                tool_answer = llm.call_tool(tool)
+                print(Colors.RED)
+                print(tool_answer)
+                print(Colors.ENDC)
+            except Exception as ex:
+                print(ex)
 
         assert_tool_calls(query, query_dict["tool_calls"], chosen_tools)
        

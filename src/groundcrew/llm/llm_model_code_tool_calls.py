@@ -4,8 +4,9 @@ load_dotenv("..")
 import json
 
 
+from groundcrew.dataclasses import Colors
 from groundcrew.toolfolder.code_analysis_tools import tool_functions as code_tool_functions
-
+from InfluxRecording import AiRackRecorder, RemarkTag
 
 user_query_dicts = [
     {"query":"how is the system message for each call to the llm built?"                         , "tool_calls": [{"name": "CodebaseQATool", "arguments": {"user_prompt": "explain how the system message for each LLM call is constructed within the system", "include_code": True}}]}, 
@@ -22,13 +23,50 @@ def assert_tool_calls(query, expected, chosen_tools):
     else:
         modified_chosen_tools = None
 
+    if expected is None:
+        if chosen_tools is None:
+            print(Colors.GREEN, f"correct tool choice", Colors.ENDC) 
+            return True
+        if chosen_tools is not None:
+            print(Colors.YELLOW, f"Assertion: unexpected tool choice", Colors.ENDC)
+            return False
+        
+    if chosen_tools is None:
+        if expected is not None:
+            print(Colors.RED, f"Assertion: missing tool choice", Colors.ENDC)
+            return False
+    
+    success = True
+    
     if modified_chosen_tools != expected:
         if modified_chosen_tools is None:
-            print(f"Assertion: wrong tool_calls for query '{query}': {chosen_tools}")
+            print(Colors.RED, f"Assertion: no tool_calls for query '{query}': {chosen_tools}")
+            success = False
         else:
-            print(f"Assertion: unexpected tool call for query '{query}': {chosen_tools}")
+            expected_tool = expected[0]
+            expected_tool_name = expected_tool['name']
+            if not expected_tool_name in [tool['name'] for tool in chosen_tools]:
+                print(Colors.RED, f"Assertion: expected tool not called '{query}': {chosen_tools}")
+                success = False
+                
+            else:
+                print(Colors.GREEN, f"correct tool choice")
+                
+                chosen_tool = [tool for tool in chosen_tools if tool['name']==expected_tool_name][0]
+                expected_args = expected_tool.get('arguments', {})
+                calculated_args = chosen_tool.get('arguments', {})
+                for key in expected_args:
+                    if not key in calculated_args:
+                        print(Colors.RED, f"Item {expected_tool_name}: Missing argument key '{key}' in calculated arguments")
+                        success = False
+
     else:
-        print(f"correct tool choice")   
+        print(Colors.GREEN)
+        print(f"correct tool choice")
+    
+    print(Colors.ENDC)
+
+    return success
 
 
 
@@ -52,19 +90,25 @@ for model in models:
     for query_dict in user_query_dicts:
         query = query_dict["query"]
 
-        answer, chosen_tools = llm.single_completion(query, model)
+        with AiRackRecorder(2) as recorder:
+            recorder.remark(RemarkTag.Comment, f"model: {model}")
 
-        if chosen_tools is None:
-            continue
+            answer, chosen_tools = llm.single_completion(query, model)
 
-        for tool in chosen_tools:
-            try:
-                tool_answer = llm.call_tool(tool)
-                print(tool_answer)
-            except Exception as ex:
-                print(ex)
+            if chosen_tools is not None:
+                for tool in chosen_tools:
+                    try:
+                        tool_answer = llm.call_tool(tool)
+                        print(Colors.BLUE, tool_answer, Colors.ENDC)
+                    except Exception as ex:
+                        print(Colors.RED, ex, Colors.ENDC)
 
-        assert_tool_calls(query, query_dict["tool_calls"], chosen_tools)
+            success = assert_tool_calls(query, query_dict["tool_calls"], chosen_tools)
+            recorder.remark(RemarkTag.Comment, f"model: {model}, success: {success}")
 
-        
+        recording = recorder.recording
+
+        print(Colors.MAGENTA, f"model: {model}, success: {success}, energy used: {recording.keyfigures.start_end_extra_energy:.1f} Ws", Colors.ENDC)
+
+
 print("\n\n*** all done ***")
