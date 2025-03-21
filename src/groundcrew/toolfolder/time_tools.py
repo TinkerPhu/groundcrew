@@ -1,8 +1,9 @@
 from time import time
+from datetime import datetime
 from typing import Union
 
 def add_numbers(x: int, y: Union[int, None] = None) -> int:
-    """Add two numbers together.
+    """Adds two numbers together.
     args:
         x (integer): The first number
         y (integer, optional): The second number
@@ -19,12 +20,13 @@ def get_time():
     Returns:
         string: the time as string
     """
-    return str(time)
+    time_str = datetime.now().strftime("%H:%M on %B %d, %Y")
+    return str(time_str)
 
 class ProgramRunningeDuration:
 
     def __init__(self):
-        self._start = time
+        self._start = time()
 
     def passed_since_start(self):
         """Gets the duration since the program started running.
@@ -33,7 +35,7 @@ class ProgramRunningeDuration:
         Returns:
             string: the duration since the program started as string.
         """
-        return str(time-self._start)
+        return str(time()-self._start)
 
 tool_functions = [
     add_numbers,

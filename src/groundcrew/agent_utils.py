@@ -30,7 +30,7 @@ def parse_response(text: str, keywords: list[str]) -> dict[str, str | list[str]]
     tool_encountered = False
 
     for line in lines:
-
+        line = line.strip()
         # Check for the start of a new tool section
         if line.startswith('Tool:'):
 

@@ -275,9 +275,14 @@ def start_chat(model: str, client: ollama.Client) -> Callable:
             )
             
             print(Colors.MAGENTA)
-            print(input_messages)
+            for input_message in input_messages:
+                print("\n"+input_message["role"]+":")
+                print(Colors.MAGENTA)
+                print(input_message["content"])
             print(Colors.CYAN)
-            print(response.message)
+            #print(response.message)
+            print("\n"+response.message["role"]+":")
+            print(response.message["content"])
             print(Colors.ENDC)
 
             print(f"🗨  internal LLM({model})")

@@ -176,6 +176,19 @@ def summarize_file(
             print('Loading summary for', key)
 
 
+
+
+from dotenv import load_dotenv
+load_dotenv("..")
+from groundcrew.llm.llm_model import ollama_model
+#llmO = ollama_model(base_message="You are a specialist for code analysis. The user will ask questions to a codebase that is available to you by utilizing tools you are given. Using them will give you the required information to answer the query. Do not speculate about the codebase, use the tools to request details.")
+llmO = ollama_model(base_message="You are an assistant that answers question about a codebase. All of the user's questions should be about this particular codebase, and you will be given tools that you can use to help you answer questions about the codebase.")
+# llmO = ollama_model(base_message="You are an assistant that answers question about a codebase. All of the user's questions should be about this particular codebase, and you will be given tools that you can use to help you answer questions about the codebase."+"""
+# Look at the Tool descriptions and choose one (or more) which seams likely to give you specific information to answer the users query in the Question section. 
+# """)
+
+
+
 @click.command()
 @click.option('--config', '-c', default='config.yaml')
 @click.option('--model', '-m', default='gpt-4-1106-preview')
@@ -247,10 +260,23 @@ def main(config: str, model: str, prompts_file: str | None):
     )
     utils.save_tools_to_yaml(tools, tools_filepath)
 
+    llmO.setup()
+    for name, tool in tools.items():
+        llmO.register_tool_object(name, tool.obj, tool.obj.__call__)
+
+    prompt = "how is the system message for each call to the llm built?"
+    prompt = "how exactly is the system message for each call to the llm built in the codebase?"
+    answer,tool_calls = llmO.single_completion(prompt, model )
+    #answer,tools = llmO.single_completion("how is the system message for each call to the llm built?", model )
+    #print(tool_calls)
+    print(answer.message.content)
+    print("\n\n=== now Agent ===\n")
     # The agent LLM is a chat LLM that takes a list of messages as input and
     # returns a message
     agent_chat_llm = utils.build_llm_chat_client(model)
     agent = Agent(config, collection, agent_chat_llm, tools)
+
+    agent.run_with_prompts([prompt])
 
     # Prompts file was provided for testing
     if prompts_file is not None:

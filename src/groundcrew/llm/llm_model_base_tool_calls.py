@@ -5,6 +5,7 @@ import json
 
 from groundcrew.toolfolder.time_tools import tool_functions as time_tool_functions
 
+
 user_query_dicts = [
     {"query":"what's the current time?"               , "tool_calls": [{"name": "get_time", "arguments": {}}]}, 
     {"query":"what is 234 + 345?"                     , "tool_calls": [{"name": "add_numbers", "arguments": {"x": 234, "y": 345}}]}, 
@@ -37,7 +38,8 @@ llm = ollama_model()
 llm.setup()
 
 for function in time_tool_functions:
-    llm.register_tool(function)
+    llm.register_tool_function(function)
+
 
 models = llm.get_models()
 for model in models:
@@ -46,6 +48,13 @@ for model in models:
         query = query_dict["query"]
 
         answer, chosen_tools = llm.single_completion(query, model)
+
+        if chosen_tools is None:
+            continue
+
+        for tool in chosen_tools:
+            tool_answer = llm.call_tool(tool)
+            print(tool_answer)
 
         assert_tool_calls(query, query_dict["tool_calls"], chosen_tools)
        

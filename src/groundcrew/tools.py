@@ -124,11 +124,20 @@ class LintFileTool:
             user_prompt: str,
             filepath_inexact: str) -> str:
         """
-        Answer questions using about linting results for a file.
-        filepath_inexact is a file path which can be inexact, it will be fuzzy
-        matched to find an exact file path for the project.
-        Linters usually operate per file so this granularity makes sense.
+        Lints a specific file of the code base according to the users prompt.
+        args:
+            user_prompt (str): The prompt to process.
+            filepath_inexact (str): path of file to lint
+
+        Returns:
+            str: The linter output that will be provided to finally answer the users query.
         """
+        # """
+        # Answer questions using about linting results for a file.
+        # filepath_inexact is a file path which can be inexact, it will be fuzzy
+        # matched to find an exact file path for the project.
+        # Linters usually operate per file so this granularity makes sense.
+        # """
 
         # ensure that filepath is a real path of a file in the collection
         # TODO: figure out what the correct threshold is here...
@@ -351,16 +360,17 @@ class CodebaseQATool:
 
     def __call__(self, user_prompt: str, include_code: bool) -> str:
         """
-        Processes a given prompt, queries the codebase, and uses the language
-        model to generate a response.
+        Searches information in the codebase regarding the users prompt, queries the codebase and gets relevant code snippeds. 
+        Use this if none of the other tools seams to be usefull.
 
-        Args:
-            prompt (str): The prompt to process.
+        args:
+            user_prompt (str): The prompt to process.
             include_code (bool): Flag to include code in the response.
 
         Returns:
             str: The generated response from the language model.
         """
+
         chunks = query_codebase(user_prompt, self.collection)
 
         prompt = ''
