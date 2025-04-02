@@ -1,4 +1,4 @@
-﻿namespace CodeExtractor;
+﻿namespace CodeExtractorNS;
 
 public enum NodeType
 {

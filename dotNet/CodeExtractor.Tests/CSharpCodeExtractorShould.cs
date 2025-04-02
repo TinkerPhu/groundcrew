@@ -4,10 +4,10 @@ using System.Reflection;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CodeExtractor.Tests;
+namespace CodeExtractorNS.Tests;
 
 [TestClass]
-[TestSubject(typeof(global::CodeExtractor.CSharpCodeExtractor))]
+[TestSubject(typeof(global::CodeExtractorNS.CSharpCodeExtractor))]
 public class CSharpCodeExtractorShould
 {
 
@@ -19,12 +19,12 @@ public class CSharpCodeExtractorShould
         
         Assert.IsTrue(File.Exists(path));
 
-        var result  = global::CodeExtractor.CSharpCodeExtractor.ExtractFromFile(path, "Class");
+        var result  = global::CodeExtractorNS.CSharpCodeExtractor.ExtractFromFile(path, "Class");
         var resultClasses = (Dictionary<string,object>)result["Class"];
         Assert.AreEqual(1, resultClasses.Keys.Count);
         Assert.Contains("ExampleClass", resultClasses.Keys);
 
-        result  = global::CodeExtractor.CSharpCodeExtractor.ExtractFromFile(path, "Method");
+        result  = global::CodeExtractorNS.CSharpCodeExtractor.ExtractFromFile(path, "Method");
         var resultMethods = (Dictionary<string,object>)result["Method"];
         Assert.AreEqual(2, resultMethods.Keys.Count);
         Assert.Contains("ExampleClass.MethodOne", resultMethods.Keys);

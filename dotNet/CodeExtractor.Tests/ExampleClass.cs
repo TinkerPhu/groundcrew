@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CodeExtractor.Tests;
+namespace CodeExtractorNS.Tests;
 
 public class ExampleClass
 {

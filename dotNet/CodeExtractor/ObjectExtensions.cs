@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace CodeExtractor;
+namespace CodeExtractorNS;
 
 public static class ObjectExtensions
 {

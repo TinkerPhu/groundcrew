@@ -3,22 +3,25 @@
 import ctypes
 import os
 import sys
+import importlib
 
 # dotnet framework runtime
 import pythonnet
 from pythonnet import load
 info = pythonnet.get_runtime_info()
 #load("netfx")
-conf_path = os.path.abspath(os.path.normpath("./runtimeconfig.json"))
+from clr_loader import get_coreclr
+from pythonnet import set_runtime
+
+conf_path = os.path.abspath(os.path.normpath("./dotNet/published.RefApp/ReferingApp.runtimeconfig.json"))
 if not os.path.exists(conf_path): raise Exception(f"File does not exist: {conf_path}")
 
-# from pythonnet import set_runtime
-# from clr_loader import get_coreclr
+rt = get_coreclr(runtime_config=conf_path)
+set_runtime(rt)
 
-# rt = get_coreclr(runtime_config="/path/to/runtimeconfig.json")
-# set_runtime(rt)
+#load("coreclr", runtime_config=conf_path)
+#load("netfx", runtime_config=conf_path)
 
-load("coreclr", runtime_config="./runtimeconfig.json")
 info = pythonnet.get_runtime_info()
 import clr
 info = pythonnet.get_runtime_info()
@@ -36,7 +39,7 @@ def get_existing_abs_path(any_path:str)->str:
     if not os.path.exists(abs_path): raise Exception(f"File does not exist: {abs_path}")
     return abs_path
 
-def load_assembly(assembly_path:str)->None:
+def load_assembly(assembly_path:str, expected_namespace: str|None=None)->None:
     import sys
     import os
     import clr
@@ -48,36 +51,45 @@ def load_assembly(assembly_path:str)->None:
     assembly_name = os.path.splitext(os.path.basename(abs_assembly_path))[0]
     clr.AddReference(assembly_name)
 
+    if expected_namespace:
+        importlib.import_module(expected_namespace)
+        module_names = list(sys.modules.keys())
+        if expected_namespace not in module_names:
+            print(sys.modules.keys())
+            print(module_names)
+            raise Exception(f"could not load namespace {expected_namespace}")
+        
+
 def assert_equal(expectation, value, message):
     if expectation != value:
         raise Exception(message)
 
-load_assembly("./dotNet/CodeExtractor/bin/Debug/net9.0/CodeExtractor.dll")
-load_assembly("./dotNet/ClassLibrary1/bin/Debug/net9.0/ClassLibrary1.dll")
+
+load_assembly("./dotNet/published.RefApp/ClassLibrary1.dll", 'ClassLibraryNS')
 
 
-from ClassLibrary1 import Class1
+from ClassLibraryNS import Class1
 
-print(sys.modules.keys())
+
 
 assert_equal(12, Class1.hello(), "wrong return value from hello")
 assert_equal('345', Class1.helloS(345), "wrong return value from helloS")
 
+from ClassLibraryNS import CodeVisitor
+
+lis = List[String]()
+lis.Add("Class")
+codevisitor = CodeVisitor(lis)
 
 
+load_assembly("./dotNet/published.RefApp/CodeExtractor.dll", 'CodeExtractorNS')
 
-from ClassLibrary1NS import CodeVisitorNew
-codevisitor = CodeVisitorNew("Class")
 
-# from ClassLibrary1NS import CodeExtractor
-# dic = CodeExtractor.ExtractFromFile("../../../CodeExtractor.cs","Class")
+from CodeExtractorNS import CSharpCodeExtractor
 
-# load_assembly("./dotNet/CodeExtractor/bin/Debug/net8.0/CodeExtractor.dll")
-load_assembly("./dotNet/ConsoleApp1/bin/publish/ConsoleApp1.exe")
-from ConsoleApp1NS import Class2
-res = Class2.helloWorld()
-from ConsoleApp1NS import CodeExtractorApp
-res = CodeExtractorApp.ExtractFromFile("../../../CodeExtractor.cs","Class")
+codeextractor = CSharpCodeExtractor()
+
+res = CSharpCodeExtractor.ExtractFromFile("../../../CodeExtractor.cs","Class")
 
 
 def extract_csharp_from_file(file_path, node_type):

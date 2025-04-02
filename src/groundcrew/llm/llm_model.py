@@ -63,7 +63,8 @@ from types import SimpleNamespace
 from ollama._utils import convert_function_to_tool
 from typing import List, Callable
 from groundcrew.dataclasses import Colors
-
+import mlflow
+from mlflow.tracing import set_span_chat_messages, set_span_chat_tools
 
 class ollama_model(llm_model):
 
@@ -123,16 +124,18 @@ Parameters (given here as object with properties that are the parameters):
         self._tool_funcs[tool.function.name] = func
         self._tools.append(tool)
         self._tools_system_prompt = None
+        return tool.function.name
 
 
 
+    @mlflow.trace(span_type="TOOL")#, attributes={"key1": "value1"})
     def call_tool(self, tool)->any:
-        tool_name = tool['name']
+        tool_name = tool.get('name')
         if tool_name not in self._tool_funcs:
             raise Exception(f"tool {tool_name} unknown")
         
         func = self._tool_funcs[tool_name]
-        arguments = tool["arguments"]
+        arguments = tool.get('arguments')
 
         # Use inspect to get the accepted argument names
         sig = inspect.signature(func)
@@ -145,8 +148,11 @@ Parameters (given here as object with properties that are the parameters):
         return func(**filtered_arguments)
         
 
+    @mlflow.trace(span_type="CHAT_MODEL")
+    #@mlflow.trace 
     def single_completion(self, query, model:str|None=None)->tuple:
         print(f"\n=== {query} ===")
+        #mlflow.log_metric("Metric2", 2.234)
 
         if model is None:
             model = self._default_model
@@ -159,7 +165,7 @@ Parameters (given here as object with properties that are the parameters):
             tools_system_prompt = self._get_tools_system_prompt()
 
             input_messages = [ 
-                            {'role': 'system', 'content':self._base_message},#+"\n"+tools_system_prompt}, 
+                            {'role': 'system', 'content':self._base_message+"\n"+tools_system_prompt}, 
                             {'role': 'user', 'content':"### Question ###\n"+query}
                         ]
             answer = self._client.chat(model=model,
@@ -184,7 +190,8 @@ Parameters (given here as object with properties that are the parameters):
                 print(f"{type(ex).__name__}, model {model.name}: {ex}")
                 raise ex
 
-
+        span = mlflow.get_current_active_span()
+        set_span_chat_messages(span, input_messages)
 
         # print(Colors.MAGENTA)
         # for input_message in input_messages:
@@ -209,7 +216,7 @@ Parameters (given here as object with properties that are the parameters):
         else:
             chosen_tools = extract_json_array(answer.message.content)
         
-
+        set_span_chat_tools(span, self._tools)
 
         print(chosen_tools)
 

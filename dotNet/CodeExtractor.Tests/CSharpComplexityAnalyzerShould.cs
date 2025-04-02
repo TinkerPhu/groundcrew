@@ -7,10 +7,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CodeExtractor.Tests;
+namespace CodeExtractorNS.Tests;
 
 [TestClass]
-[TestSubject(typeof(global::CodeExtractor.CSharpComplexityAnalyzer))]
+[TestSubject(typeof(global::CodeExtractorNS.CSharpComplexityAnalyzer))]
 public class CSharpComplexityAnalyzerShould
 {
     [TestMethod]

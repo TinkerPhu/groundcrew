@@ -1,4 +1,4 @@
-﻿namespace CodeExtractor.App
+﻿namespace CodeExtractorNS.App
 {
     public class DemoExampleClass
     {

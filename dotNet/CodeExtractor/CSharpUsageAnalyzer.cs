@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.CodeAnalysis.FindSymbols;
 using System.Linq;
 
-namespace CodeExtractor;
+namespace CodeExtractorNS;
 
 public class CSharpUsageAnalyzer
 {

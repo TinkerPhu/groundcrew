@@ -1,8 +1,7 @@
 ﻿using System.Collections;
 using System.Text.Json;
-using static CodeExtractor.CSharpCodeExtractor;
 
-namespace CodeExtractor.App
+namespace CodeExtractorNS.App
 {
     internal class Program
     {
